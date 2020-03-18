@@ -24,17 +24,27 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
-app.get('/api/timestamp/:datestring?', function (req, res) {
+app.get('/api/timestamp', function (req, res){
+  var date = new Date();
+  res.json({ "unix": date.getTime(), "utc": date.toUTCString()});
+});
+
+app.get('/api/timestamp/:datestring', function (req, res) {
   var date_string = req.params.datestring;
+  
+  // Under ISO 8601, a 4-digit string counts as a year.
+  // Any numeric string longer than this must be a Unix timestamp.
   var date;
-  if (date_string == undefined) {
-    date = new Date();
-  } else if (!isNaN(date_string)) {
-    date = new Date(parseInt(date_string));
+  if (isNaN(date_string) || date_string.length <= 4) {
+    date = new Date(date_string);
   } else {
-    date = new Date(date_string)
+    date = new Date(parseInt(date_string));
   }
-  res.json({ unix: date.getTime(), utc: date.toUTCString()});
+  if (date.toUTCString() === "Invalid Date") {
+    res.json({ "error": "Invalid Date" });
+  } else {
+    res.json({ "unix": date.getTime(), "utc": date.toUTCString()});
+  }
 });
 
 
