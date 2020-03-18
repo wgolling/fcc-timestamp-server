@@ -26,13 +26,15 @@ app.get("/api/hello", function (req, res) {
 
 app.get('/api/timestamp/:datestring?', function (req, res) {
   var date_string = req.params.datestring;
-  if (!isNaN(date_string)) {
-    date_string = parseInt(date_string);
+  var date;
+  if (date_string == undefined) {
+    date = new Date();
+  } else if (!isNaN(date_string)) {
+    date = new Date(parseInt(date_string));
+  } else {
+    date = new Date(date_string)
   }
-  var date = (date_string == undefined) ? new Date() : new Date(date_string);
-
   res.json({ unix: date.getTime(), utc: date.toUTCString()});
-  // console.log(word);
 });
 
 
